@@ -55,6 +55,7 @@
 #include "NGAP_NGResetAcknowledge.h"
 #include "NGAP_NGSetupRequest.h"
 #include "NGAP_NGSetupResponse.h"
+#include "NGAP_NGRegistrationAccept.h"
 #include "NGAP_NGSetupFailure.h"
 #include "NGAP_PathSwitchRequest.h"
 #include "NGAP_PathSwitchRequestAcknowledge.h"
@@ -200,6 +201,7 @@ typedef struct NGAP_SuccessfulOutcome {
 			NGAP_MulticastSessionUpdateResponse_t	 MulticastSessionUpdateResponse;
 			NGAP_NGResetAcknowledge_t	 NGResetAcknowledge;
 			NGAP_NGSetupResponse_t	 NGSetupResponse;
+			NGAP_NGRegistrationAccept_t NGRegistrationAccept;
 			NGAP_PathSwitchRequestAcknowledge_t	 PathSwitchRequestAcknowledge;
 			NGAP_PDUSessionResourceModifyResponse_t	 PDUSessionResourceModifyResponse;
 			NGAP_PDUSessionResourceModifyConfirm_t	 PDUSessionResourceModifyConfirm;

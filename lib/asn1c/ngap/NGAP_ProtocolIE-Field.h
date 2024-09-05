@@ -1104,6 +1104,18 @@ typedef enum NGAP_NGSetupResponseIEs__value_PR {
 	NGAP_NGSetupResponseIEs__value_PR_IAB_Supported,
 	NGAP_NGSetupResponseIEs__value_PR_Extended_AMFName
 } NGAP_NGSetupResponseIEs__value_PR;
+// Added by Valentina
+typedef enum NGAP_NGRegistrationAcceptIEs_value_PR{
+	GAP_NGRegistrationAcceptIEs__value_PR_NOTHING,	/* No components present */
+	NGAP_NGRegistrationAcceptIEs__value_PR_AMFName,
+	NGAP_NGRegistrationAcceptIEs__value_PR_ServedGUAMIList,
+	NGAP_NGRegistrationAcceptIEs__value_PR_RelativeAMFCapacity,
+	NGAP_NGRegistrationAcceptIEs__value_PR_PLMNSupportList,
+	NGAP_NGRegistrationAcceptIEs__value_PR_CriticalityDiagnostics,
+	NGAP_NGRegistrationAcceptIEs__value_PR_UERetentionInformation,
+	NGAP_NGRegistrationAcceptIEs__value_PR_IAB_Supported,
+	NGAP_NGRegistrationAcceptIEs__value_PR_Extended_AMFName
+}NGAP_NGRegistrationAcceptIEs_value_PR;
 typedef enum NGAP_NGSetupFailureIEs__value_PR {
 	NGAP_NGSetupFailureIEs__value_PR_NOTHING,	/* No components present */
 	NGAP_NGSetupFailureIEs__value_PR_Cause,
@@ -3779,6 +3791,28 @@ typedef struct NGAP_NGSetupResponseIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } NGAP_NGSetupResponseIEs_t;
+//Added by Valentina
+typedef struct NGAP_NGRegistrationAcceptIEs{
+	NGAP_ProtocolIE_ID_t id;
+	NGAP_Criticality_t criticality;
+	struct NGAP_NGRegistrationAcceptIEs_value{
+		NGAP_NGRegistrationAcceptIEs_value_PR present;
+		union NGAP_NGRegistrationAcceptIEs_NGAP_value_u{
+			NGAP_AMFName_t	 AMFName;
+			NGAP_ServedGUAMIList_t	 ServedGUAMIList;
+			NGAP_RelativeAMFCapacity_t	 RelativeAMFCapacity;
+			NGAP_PLMNSupportList_t	 PLMNSupportList;
+			NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+			NGAP_UERetentionInformation_t	 UERetentionInformation;
+			NGAP_IAB_Supported_t	 IAB_Supported;
+			NGAP_Extended_AMFName_t	 Extended_AMFName;
+
+	} choice;
+	/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} value;
+	
+}NGAP_NGRegistrationAcceptIEs_t;
 typedef struct NGAP_NGSetupFailureIEs {
 	NGAP_ProtocolIE_ID_t	 id;
 	NGAP_Criticality_t	 criticality;

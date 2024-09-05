@@ -22,54 +22,54 @@
 void testgmm_handle_registration_accept(test_ue_t *test_ue,
         ogs_nas_5gs_registration_accept_t *registration_accept)
 {
-    ogs_nas_pdu_session_status_t *pdu_session_status = NULL;
-    ogs_nas_pdu_session_reactivation_result_t *pdu_session_reactivation_result;
+    // ogs_nas_pdu_session_status_t *pdu_session_status = NULL;
+    // ogs_nas_pdu_session_reactivation_result_t *pdu_session_reactivation_result;
 
     ogs_assert(test_ue);
     ogs_assert(registration_accept);
 
-    pdu_session_status = &registration_accept->pdu_session_status;
-    pdu_session_reactivation_result =
-        &registration_accept->pdu_session_reactivation_result;
+    // pdu_session_status = &registration_accept->pdu_session_status;
+    // pdu_session_reactivation_result =
+    //     &registration_accept->pdu_session_reactivation_result;
 
-    if (registration_accept->presencemask &
-            OGS_NAS_5GS_REGISTRATION_ACCEPT_5G_GUTI_PRESENT) {
-        ogs_nas_5gs_mobile_identity_t *mobile_identity = NULL;
-        ogs_nas_5gs_mobile_identity_guti_t *mobile_identity_guti = NULL;
+    // if (registration_accept->presencemask &
+    //         OGS_NAS_5GS_REGISTRATION_ACCEPT_5G_GUTI_PRESENT) {
+    //     ogs_nas_5gs_mobile_identity_t *mobile_identity = NULL;
+    //     ogs_nas_5gs_mobile_identity_guti_t *mobile_identity_guti = NULL;
 
-        mobile_identity = &registration_accept->guti;
-        mobile_identity_guti = mobile_identity->buffer;
+    //     mobile_identity = &registration_accept->guti;
+    //     mobile_identity_guti = mobile_identity->buffer;
 
-        memcpy(&test_ue->nas_5gs_guti.nas_plmn_id,
-                &mobile_identity_guti->nas_plmn_id, OGS_PLMN_ID_LEN);
-        memcpy(&test_ue->nas_5gs_guti.amf_id,
-                &mobile_identity_guti->amf_id, sizeof(ogs_amf_id_t));
-        test_ue->nas_5gs_guti.m_tmsi = be32toh(mobile_identity_guti->m_tmsi);
-    }
+    //     memcpy(&test_ue->nas_5gs_guti.nas_plmn_id,
+    //             &mobile_identity_guti->nas_plmn_id, OGS_PLMN_ID_LEN);
+    //     memcpy(&test_ue->nas_5gs_guti.amf_id,
+    //             &mobile_identity_guti->amf_id, sizeof(ogs_amf_id_t));
+    //     test_ue->nas_5gs_guti.m_tmsi = be32toh(mobile_identity_guti->m_tmsi);
+    // }
 
-    test_ue->pdu_session_status = 0;
-    test_ue->pdu_session_reactivation_result = 0;
-    if (registration_accept->presencemask &
-        OGS_NAS_5GS_REGISTRATION_ACCEPT_ALLOWED_NSSAI_PRESENT) {
-        test_ue->allowed_nssai.num_of_s_nssai =
-            ogs_nas_parse_nssai(
-                    test_ue->allowed_nssai.s_nssai,
-                    &registration_accept->allowed_nssai);
-        ogs_assert(test_ue->allowed_nssai.num_of_s_nssai);
-    }
-    if (registration_accept->presencemask &
-        OGS_NAS_5GS_REGISTRATION_ACCEPT_REJECTED_NSSAI_PRESENT) {
-        test_ue->rejected_nssai.num_of_s_nssai =
-            ogs_nas_parse_rejected_nssai(
-                    test_ue->rejected_nssai.s_nssai,
-                    &registration_accept->rejected_nssai);
-    }
-    if (registration_accept->presencemask &
-        OGS_NAS_5GS_REGISTRATION_ACCEPT_PDU_SESSION_STATUS_PRESENT)
-        test_ue->pdu_session_status = pdu_session_status->psi;
-    if (registration_accept->presencemask & OGS_NAS_5GS_REGISTRATION_ACCEPT_PDU_SESSION_REACTIVATION_RESULT_PRESENT)
-        test_ue->pdu_session_reactivation_result =
-            pdu_session_reactivation_result->psi;
+    // test_ue->pdu_session_status = 0;
+    // test_ue->pdu_session_reactivation_result = 0;
+    // if (registration_accept->presencemask &
+    //     OGS_NAS_5GS_REGISTRATION_ACCEPT_ALLOWED_NSSAI_PRESENT) {
+    //     test_ue->allowed_nssai.num_of_s_nssai =
+    //         ogs_nas_parse_nssai(
+    //                 test_ue->allowed_nssai.s_nssai,
+    //                 &registration_accept->allowed_nssai);
+    //     ogs_assert(test_ue->allowed_nssai.num_of_s_nssai);
+    // }
+    // if (registration_accept->presencemask &
+    //     OGS_NAS_5GS_REGISTRATION_ACCEPT_REJECTED_NSSAI_PRESENT) {
+    //     test_ue->rejected_nssai.num_of_s_nssai =
+    //         ogs_nas_parse_rejected_nssai(
+    //                 test_ue->rejected_nssai.s_nssai,
+    //                 &registration_accept->rejected_nssai);
+    // }
+    // if (registration_accept->presencemask &
+    //     OGS_NAS_5GS_REGISTRATION_ACCEPT_PDU_SESSION_STATUS_PRESENT)
+    //     test_ue->pdu_session_status = pdu_session_status->psi;
+    // if (registration_accept->presencemask & OGS_NAS_5GS_REGISTRATION_ACCEPT_PDU_SESSION_REACTIVATION_RESULT_PRESENT)
+    //     test_ue->pdu_session_reactivation_result =
+    //         pdu_session_reactivation_result->psi;
 }
 
 void testgmm_handle_service_accept(test_ue_t *test_ue,

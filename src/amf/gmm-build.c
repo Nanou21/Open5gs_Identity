@@ -105,7 +105,7 @@ ogs_pkbuf_t *gmm_build_registration_accept(amf_ue_t *amf_ue)
             &amf_self()->served_tai[served_tai_index].list2));
 
     /* Set Allowed NSSAI */
-    ogs_assert(amf_ue->allowed_nssai.num_of_s_nssai);
+   // ogs_assert(amf_ue->allowed_nssai.num_of_s_nssai);
 
     ogs_nas_build_nssai(allowed_nssai,
             amf_ue->allowed_nssai.s_nssai,
@@ -171,6 +171,177 @@ ogs_pkbuf_t *gmm_build_registration_accept(amf_ue_t *amf_ue)
 
     return pkbuf;
 }
+// ogs_pkbuf_t *gmm_build_registration_accept(amf_ue_t *amf_ue) {
+//     ogs_pkbuf_t *pkbuf = NULL;
+//     ogs_nas_5gs_message_t message;
+//     ogs_nas_5gs_registration_accept_t *registration_accept = &message.gmm.registration_accept;
+//     ogs_nas_5gs_registration_result_t *registration_result = &registration_accept->registration_result;
+
+//     memset(&message, 0, sizeof(message));
+//     message.h.security_header_type = OGS_NAS_SECURITY_HEADER_INTEGRITY_PROTECTED_AND_CIPHERED;
+//     message.h.extended_protocol_discriminator = OGS_NAS_EXTENDED_PROTOCOL_DISCRIMINATOR_5GMM;
+//     message.gmm.h.extended_protocol_discriminator = OGS_NAS_EXTENDED_PROTOCOL_DISCRIMINATOR_5GMM;
+//     message.gmm.h.message_type = OGS_NAS_5GS_REGISTRATION_ACCEPT;
+
+//     // Set Registration Result
+//     registration_result->length = 1;
+//     registration_result->value = 0;  // Set appropriate value for your use case
+
+//     // Optionally set GUTI, TAI list, and other fields
+//     // registration_accept->guti = ...;
+//     // registration_accept->tai_list = ...;
+
+//     pkbuf = nas_5gs_security_encode(amf_ue, &message);
+
+//     return pkbuf;
+// }
+
+// //Duplicate function added by Valentina to accomodate changes
+
+// // ogs_pkbuf_t *gmm_build_registration_accept(amf_ue_t *amf_ue)
+// // {
+// //     int rv, served_tai_index = 0;
+// //     //ogs_pkbuf_t *pkbuf = NULL;
+
+// //     ogs_nas_5gs_message_t message;
+// //     ogs_nas_5gs_registration_accept_t *registration_accept =
+// //         &message.gmm.registration_accept;
+// //     ogs_nas_5gs_registration_result_t *registration_result =
+// //         &registration_accept->registration_result;
+// //     ogs_nas_5gs_mobile_identity_t *mobile_identity =
+// //         &registration_accept->guti;
+// //     ogs_nas_5gs_mobile_identity_guti_t mobile_identity_guti;
+// //     ogs_nas_nssai_t *allowed_nssai = &registration_accept->allowed_nssai;
+// //     ogs_nas_rejected_nssai_t *rejected_nssai =
+// //         &registration_accept->rejected_nssai;
+// //     ogs_nas_5gs_network_feature_support_t *network_feature_support =
+// //         &registration_accept->network_feature_support;
+// //     ogs_nas_pdu_session_status_t *pdu_session_status =
+// //         &registration_accept->pdu_session_status;
+// //     ogs_nas_pdu_session_reactivation_result_t *pdu_session_reactivation_result =
+// //         &registration_accept->pdu_session_reactivation_result;
+// //     ogs_nas_gprs_timer_3_t *t3512_value = &registration_accept->t3512_value;
+// //     ogs_nas_gprs_timer_2_t *t3502_value = &registration_accept->t3502_value;
+
+// //     ogs_assert(amf_ue);
+
+// //     memset(&message, 0, sizeof(message));
+// //     message.h.security_header_type =
+// //         OGS_NAS_SECURITY_HEADER_INTEGRITY_PROTECTED_AND_CIPHERED;
+// //     message.h.extended_protocol_discriminator =
+// //         OGS_NAS_EXTENDED_PROTOCOL_DISCRIMINATOR_5GMM;
+
+// //     message.gmm.h.extended_protocol_discriminator =
+// //         OGS_NAS_EXTENDED_PROTOCOL_DISCRIMINATOR_5GMM;
+// //     message.gmm.h.message_type = OGS_NAS_5GS_REGISTRATION_ACCEPT;
+
+// //     /* Registration Result */
+// //     registration_result->length = 1;
+// //     registration_result->value = amf_ue->nas.access_type;
+
+// //     /* Set GUTI */
+// //     if (amf_ue->next.m_tmsi) {
+// //         registration_accept->presencemask |=
+// //             OGS_NAS_5GS_REGISTRATION_ACCEPT_5G_GUTI_PRESENT;
+
+// //         ogs_debug("[%s]    5G-S_GUTI[AMF_ID:0x%x,M_TMSI:0x%x]", amf_ue->supi,
+// //                 ogs_amf_id_hexdump(&amf_ue->next.guti.amf_id),
+// //                 amf_ue->next.guti.m_tmsi);
+
+// //         ogs_nas_5gs_nas_guti_to_mobility_identity_guti(
+// //                 &amf_ue->next.guti, &mobile_identity_guti);
+
+// //         mobile_identity->length = sizeof(mobile_identity_guti);
+// //         mobile_identity->buffer = &mobile_identity_guti;
+// //     }
+
+// //     /* Set TAI List */
+// //     registration_accept->presencemask |= OGS_NAS_5GS_REGISTRATION_ACCEPT_TAI_LIST_PRESENT;
+
+// //     ogs_debug("[%s]    TAI[PLMN_ID:%06x,TAC:%d]", amf_ue->supi,
+// //             ogs_plmn_id_hexdump(&amf_ue->nr_tai.plmn_id), amf_ue->nr_tai.tac.v);
+// //     ogs_debug("[%s]    NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]", amf_ue->supi,
+// //             ogs_plmn_id_hexdump(&amf_ue->nr_cgi.plmn_id),
+// //             (long long)amf_ue->nr_cgi.cell_id);
+
+// //     served_tai_index = amf_find_served_tai(&amf_ue->nr_tai);
+// //     ogs_debug("[%s]    SERVED_TAI_INDEX[%d]", amf_ue->supi, served_tai_index);
+// //     ogs_assert(served_tai_index >= 0 &&
+// //             served_tai_index < OGS_MAX_NUM_OF_SUPPORTED_TA);
+
+// //     ogs_assert(OGS_OK ==
+// //         ogs_nas_5gs_tai_list_build(&registration_accept->tai_list,
+// //             &amf_self()->served_tai[served_tai_index].list0,
+// //             &amf_self()->served_tai[served_tai_index].list1,
+// //             &amf_self()->served_tai[served_tai_index].list2));
+
+// //     /* Set Allowed NSSAI */
+// //     ogs_assert(amf_ue->allowed_nssai.num_of_s_nssai);
+
+// //     ogs_nas_build_nssai(allowed_nssai,
+// //             amf_ue->allowed_nssai.s_nssai,
+// //             amf_ue->allowed_nssai.num_of_s_nssai);
+
+// //     registration_accept->presencemask |=
+// //         OGS_NAS_5GS_REGISTRATION_ACCEPT_ALLOWED_NSSAI_PRESENT;
+
+// //     if (amf_ue->rejected_nssai.num_of_s_nssai) {
+// //         ogs_nas_build_rejected_nssai(rejected_nssai,
+// //                 amf_ue->rejected_nssai.s_nssai,
+// //                 amf_ue->rejected_nssai.num_of_s_nssai);
+// //         registration_accept->presencemask |=
+// //             OGS_NAS_5GS_REGISTRATION_ACCEPT_REJECTED_NSSAI_PRESENT;
+// //     }
+
+// //     /* 5GS network feature support */
+// //     registration_accept->presencemask |=
+// //         OGS_NAS_5GS_REGISTRATION_ACCEPT_5GS_NETWORK_FEATURE_SUPPORT_PRESENT;
+// //     network_feature_support->length = 2;
+// //     network_feature_support->
+// //         ims_voice_over_ps_session_over_3gpp_access_indicator = 1;
+
+// //     /* Set T3512 : Mandatory in Open5GS */
+// //     ogs_assert(amf_self()->time.t3512.value);
+// //     rv = ogs_nas_gprs_timer_3_from_sec(
+// //             &t3512_value->t, amf_self()->time.t3512.value);
+// //     ogs_assert(rv == OGS_OK);
+// //     registration_accept->presencemask |=
+// //         OGS_NAS_5GS_REGISTRATION_ACCEPT_T3512_VALUE_PRESENT;
+// //     t3512_value->length = 1;
+
+// //     /* Set T3502 */
+// //     if (amf_self()->time.t3502.value) {
+// //         rv = ogs_nas_gprs_timer_from_sec(
+// //                 &t3502_value->t, amf_self()->time.t3502.value);
+// //         ogs_assert(rv == OGS_OK);
+// //         registration_accept->presencemask |=
+// //             OGS_NAS_5GS_REGISTRATION_ACCEPT_T3502_VALUE_PRESENT;
+// //         t3502_value->length = 1;
+// //     }
+
+// //     if (amf_ue->nas.present.pdu_session_status) {
+// //         registration_accept->presencemask |=
+// //             OGS_NAS_5GS_REGISTRATION_ACCEPT_PDU_SESSION_STATUS_PRESENT;
+// //         pdu_session_status->length = 2;
+// //         pdu_session_status->psi = get_pdu_session_status(amf_ue);
+// //         ogs_debug("[%s]    PDU Session Status : %04x",
+// //                 amf_ue->supi, pdu_session_status->psi);
+// //     }
+
+// //     if (amf_ue->nas.present.uplink_data_status) {
+// //         registration_accept->presencemask |=
+// //             OGS_NAS_5GS_REGISTRATION_ACCEPT_PDU_SESSION_REACTIVATION_RESULT_PRESENT;
+// //         pdu_session_reactivation_result->length = 2;
+// //         pdu_session_reactivation_result->psi =
+// //             get_pdu_session_reactivation_result(amf_ue);
+// //         ogs_debug("[%s]    PDU Session Reactivation Result : %04x",
+// //                 amf_ue->supi, pdu_session_reactivation_result->psi);
+// //     }
+
+// //     pkbuf = nas_5gs_security_encode(amf_ue, &message);
+
+// //     return pkbuf;
+// // }
 
 ogs_pkbuf_t *gmm_build_registration_reject(
         amf_ue_t *amf_ue, ogs_nas_5gmm_cause_t gmm_cause)

@@ -603,9 +603,9 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
             ran_ue->ue_context_requested = true;
         }
     }
-
-    ogs_expect(OGS_OK == ngap_send_to_nas(
-                ran_ue, NGAP_ProcedureCode_id_InitialUEMessage, NAS_PDU));
+    ogs_expect(OGS_OK == ngap_send_ng_registration_accept(gnb));
+    ogs_info("REgistration Accept sent");
+    return;
 }
 
 void ngap_handle_uplink_nas_transport(

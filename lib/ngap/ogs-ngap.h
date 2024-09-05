@@ -558,6 +558,7 @@
 #include "NGAP_NGSetupFailure.h"
 #include "NGAP_NGSetupRequest.h"
 #include "NGAP_NGSetupResponse.h"
+#include "NGAP_NGRegistrationAccept.h"
 #include "NGAP_NID.h"
 #include "NGAP_NonDynamic5QIDescriptor.h"
 #include "NGAP_NotAllowedTACs.h"

@@ -341,6 +341,175 @@ ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
 
     return OGS_5GMM_CAUSE_REQUEST_ACCEPTED;
 }
+// ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
+//         ogs_nas_security_header_type_t h, NGAP_ProcedureCode_t ngap_code,
+//         ogs_nas_5gs_registration_request_t *registration_request)
+// {
+//     int served_tai_index = 0;
+//     uint8_t gmm_cause;
+
+//     ran_ue_t *ran_ue = NULL;
+//     ogs_nas_5gs_registration_type_t *registration_type = NULL;
+//     ogs_nas_5gs_mobile_identity_t *mobile_identity = NULL;
+//     ogs_nas_5gs_mobile_identity_header_t *mobile_identity_header = NULL;
+//     ogs_nas_5gs_mobile_identity_suci_t *mobile_identity_suci = NULL;
+//     ogs_nas_5gs_mobile_identity_guti_t *mobile_identity_guti = NULL;
+//     ogs_nas_ue_security_capability_t *ue_security_capability = NULL;
+
+//     ogs_assert(amf_ue);
+//     ran_ue = ran_ue_find_by_id(amf_ue->ran_ue_id);
+//     ogs_assert(ran_ue);
+
+//     ogs_assert(registration_request);
+//     registration_type = &registration_request->registration_type;
+//     ogs_assert(registration_type);
+//     mobile_identity = &registration_request->mobile_identity;
+//     ogs_assert(mobile_identity);
+//     ue_security_capability = &registration_request->ue_security_capability;
+//     ogs_assert(ue_security_capability);
+
+//     /* Check for cleartext IEs and NAS container integrity */
+// #define OGS_REGISTRATION_CLEARTEXT_PRESENT 
+//         (OGS_NAS_5GS_REGISTRATION_REQUEST_UE_SECURITY_CAPABILITY_PRESENT| 
+//         OGS_NAS_5GS_REGISTRATION_REQUEST_UE_STATUS_PRESENT| 
+//         OGS_NAS_5GS_REGISTRATION_REQUEST_EPS_NAS_MESSAGE_CONTAINER_PRESENT| 
+//         OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT| 
+//         OGS_NAS_5GS_REGISTRATION_REQUEST_ADDITIONAL_GUTI_PRESENT)
+
+//     if (ngap_code == NGAP_ProcedureCode_id_InitialUEMessage &&
+//         registration_request->presencemask &
+//         ~OGS_REGISTRATION_CLEARTEXT_PRESENT) {
+//         ogs_error("Non cleartext IEs is included [0x%llx]",
+//                 (long long)registration_request->presencemask);
+//         return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//     }
+
+//     if (!h.integrity_protected &&
+//         (registration_request->presencemask &
+//         OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT)) {
+//         ogs_error("NAS container present without Integrity-protected");
+//         return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//     }
+
+//     if (!mobile_identity->length || !mobile_identity->buffer) {
+//         ogs_error("No Mobile Identity");
+//         return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//     }
+
+//     if (mobile_identity->length < OGS_NAS_5GS_MOBILE_IDENTITY_SUCI_MIN_SIZE) {
+//         ogs_error("The length of Mobile Identity(%d) is less then the min(%d)",
+//             mobile_identity->length, OGS_NAS_5GS_MOBILE_IDENTITY_SUCI_MIN_SIZE);
+//         return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//     }
+
+//     mobile_identity_header =
+//             (ogs_nas_5gs_mobile_identity_header_t *)mobile_identity->buffer;
+
+//     memset(&amf_ue->old_guti, 0, sizeof(ogs_nas_5gs_guti_t));
+
+//     switch (mobile_identity_header->type) {
+//     case OGS_NAS_5GS_MOBILE_IDENTITY_SUCI:
+//         mobile_identity_suci =
+//             (ogs_nas_5gs_mobile_identity_suci_t *)mobile_identity->buffer;
+//         if (mobile_identity_suci->h.supi_format !=
+//                 OGS_NAS_5GS_SUPI_FORMAT_IMSI) {
+//             ogs_error("Not implemented SUPI format [%d]",
+//                 mobile_identity_suci->h.supi_format);
+//             return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//         }
+//         if (mobile_identity_suci->protection_scheme_id !=
+//                 OGS_PROTECTION_SCHEME_NULL &&
+//             mobile_identity_suci->protection_scheme_id !=
+//                 OGS_PROTECTION_SCHEME_PROFILE_A &&
+//             mobile_identity_suci->protection_scheme_id !=
+//                 OGS_PROTECTION_SCHEME_PROFILE_B) {
+//             ogs_error("Invalid ProtectionSchemeID(%d) in SUCI",
+//                 mobile_identity_suci->protection_scheme_id);
+//             return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//         }
+//         ogs_nas_to_plmn_id(&amf_ue->home_plmn_id,
+//                 &mobile_identity_suci->nas_plmn_id);
+
+//         gmm_cause = gmm_cause_from_access_control(&amf_ue->home_plmn_id);
+//         if (gmm_cause != OGS_5GMM_CAUSE_REQUEST_ACCEPTED) {
+//             ogs_error("Rejected by PLMN-ID access control");
+//             return gmm_cause;
+//         }
+
+//         amf_ue_set_suci(amf_ue, mobile_identity);
+//         ogs_info("[%s]    SUCI", amf_ue->suci);
+//         break;
+//     case OGS_NAS_5GS_MOBILE_IDENTITY_GUTI:
+//         mobile_identity_guti =
+//             (ogs_nas_5gs_mobile_identity_guti_t *)mobile_identity->buffer;
+//         if (!mobile_identity_guti) {
+//             ogs_error("No mobile identity");
+//             return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//         }
+
+//         ogs_nas_5gs_mobile_identity_guti_to_nas_guti(
+//             mobile_identity_guti, &amf_ue->old_guti);
+
+//         ogs_info("[%s]    5G-S_GUTI[AMF_ID:0x%x,M_TMSI:0x%x]",
+//             AMF_UE_HAVE_SUCI(amf_ue) ? amf_ue->suci : "Unknown ID",
+//             ogs_amf_id_hexdump(&amf_ue->old_guti.amf_id),
+//             amf_ue->old_guti.m_tmsi);
+//         break;
+//     default:
+//         ogs_error("Unknown SUCI type [%d]", mobile_identity_header->type);
+//         return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+//     }
+
+//     /* Set 5GS Registration Type */
+//     memcpy(&amf_ue->nas.registration, registration_type,
+//             sizeof(ogs_nas_5gs_registration_type_t));
+//     amf_ue->nas.message_type = OGS_NAS_5GS_REGISTRATION_REQUEST;
+
+//     if (registration_type->value == OGS_NAS_5GS_REGISTRATION_TYPE_INITIAL) {
+//         OGS_ASN_CLEAR_DATA(&amf_ue->ueRadioCapability);
+//     }
+
+//     amf_ue->nas.ue.tsc = registration_type->tsc;
+//     amf_ue->nas.ue.ksi = registration_type->ksi;
+//     ogs_debug("    OLD TSC[UE:%d,AMF:%d] KSI[UE:%d,AMF:%d]",
+//             amf_ue->nas.ue.tsc, amf_ue->nas.amf.tsc,
+//             amf_ue->nas.ue.ksi, amf_ue->nas.amf.ksi);
+//     if (amf_ue->nas.ue.ksi < OGS_NAS_KSI_NO_KEY_IS_AVAILABLE) {
+//         amf_ue->nas.amf.tsc = amf_ue->nas.ue.tsc;
+//         amf_ue->nas.amf.ksi = amf_ue->nas.ue.ksi;
+//     }
+//     ogs_debug("    NEW TSC[UE:%d,AMF:%d] KSI[UE:%d,AMF:%d]",
+//             amf_ue->nas.ue.tsc, amf_ue->nas.amf.tsc,
+//             amf_ue->nas.ue.ksi, amf_ue->nas.amf.ksi);
+//      /* Check TAI */
+// //     served_tai_index = amf_find_served_tai(&amf_ue->nr_tai);
+// //     if (served_tai_index < 0) {
+// //         ogs_error("Cannot find Served TAI[PLMN_ID:%06x,TAC:%d]",
+// //             ogs_plmn_id_hexdump(&amf_ue->nr_tai.plmn_id), amf_ue->nr_tai.tac.v);
+// //         return OGS_5GMM_CAUSE_TRACKING_AREA_NOT_ALLOWED;
+// //     }
+// //     ogs_debug("    SERVED_TAI_INDEX[%d]", served_tai_index);
+//     /* Clear N2 Transfer, Paging Info, and Timers */
+//     AMF_UE_CLEAR_PAGING_INFO(amf_ue);
+//     AMF_UE_CLEAR_N2_TRANSFER(amf_ue, pdu_session_resource_setup_request);
+//     AMF_UE_CLEAR_5GSM_MESSAGE(amf_ue);
+//     CLEAR_AMF_UE_ALL_TIMERS(amf_ue);
+
+//      if (SECURITY_CONTEXT_IS_VALID(amf_ue)) {
+//         ogs_kdf_kgnb_and_kn3iwf(
+//                 amf_ue->kamf, amf_ue->ul_count.i32,
+//                 amf_ue->nas.access_type, amf_ue->kgnb);
+//         ogs_kdf_nh_gnb(amf_ue->kamf, amf_ue->kgnb, amf_ue->nh);
+//         amf_ue->nhcc = 1;
+//     }
+
+//     if (AMF_UE_HAVE_SUCI(amf_ue)) {
+//         //ran_ue_set_cause(ran_ue, OGS_NAS_5GMM_CAUSE_REQUEST_ACCEPTED);
+//         nas_5gs_send_registration_accept(amf_ue);
+//     }
+
+//     return OGS_5GMM_CAUSE_REQUEST_ACCEPTED;
+// }
 
 ogs_nas_5gmm_cause_t gmm_handle_registration_update(
         ran_ue_t *ran_ue, amf_ue_t *amf_ue,

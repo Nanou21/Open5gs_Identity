@@ -18,6 +18,147 @@
  */
 
 #include "ngap-build.h"
+ogs_pkbuf_t *ngap_build_registration_accept_message(void)
+{
+    int i, j;
+
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_NGRegistrationAccept_t *NGRegistrationAccept = NULL;
+
+    NGAP_NGRegistrationAcceptIEs_t *ie = NULL;
+    NGAP_AMFName_t *AMFName = NULL;
+    NGAP_ServedGUAMIList_t *ServedGUAMIList = NULL;
+    NGAP_RelativeAMFCapacity_t *RelativeAMFCapacity = NULL;
+    NGAP_PLMNSupportList_t *PLMNSupportList = NULL;
+
+    ogs_debug("RegistrationAccept");
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome =
+        CALLOC(1, sizeof(NGAP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = NGAP_ProcedureCode_id_NGSetup;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present =
+        NGAP_SuccessfulOutcome__value_PR_NGSetupResponse;
+
+    NGRegistrationAccept = &successfulOutcome->value.choice.NGRegistrationAccept;
+
+    ie = CALLOC(1, sizeof(NGAP_NGSetupResponseIEs_t));
+    ASN_SEQUENCE_ADD(&NGRegistrationAccept->protocolIEs, ie);
+
+    ie->id = NGAP_ProtocolIE_ID_id_AMFName;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_NGRegistrationAcceptIEs__value_PR_AMFName;
+
+    AMFName = &ie->value.choice.AMFName;
+
+    ie = CALLOC(1, sizeof(NGAP_NGSetupResponseIEs_t));
+    ASN_SEQUENCE_ADD(&NGRegistrationAccept->protocolIEs, ie);
+
+    ie->id = NGAP_ProtocolIE_ID_id_ServedGUAMIList;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_NGRegistrationAcceptIEs__value_PR_ServedGUAMIList;
+
+    ServedGUAMIList = &ie->value.choice.ServedGUAMIList;
+
+    ie = CALLOC(1, sizeof(NGAP_NGSetupResponseIEs_t));
+    ASN_SEQUENCE_ADD(&NGRegistrationAccept->protocolIEs, ie);
+
+    ie->id = NGAP_ProtocolIE_ID_id_RelativeAMFCapacity;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_NGRegistrationAcceptIEs__value_PR_RelativeAMFCapacity;
+
+    RelativeAMFCapacity = &ie->value.choice.RelativeAMFCapacity;
+
+    ie = CALLOC(1, sizeof(NGAP_NGSetupResponseIEs_t));
+    ASN_SEQUENCE_ADD(&NGRegistrationAccept->protocolIEs, ie);
+
+    ie->id = NGAP_ProtocolIE_ID_id_PLMNSupportList;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_NGRegistrationAcceptIEs__value_PR_PLMNSupportList;
+
+    PLMNSupportList = &ie->value.choice.PLMNSupportList;
+
+    ogs_asn_buffer_to_OCTET_STRING((char*)amf_self()->amf_name,
+            strlen(amf_self()->amf_name), AMFName);
+
+    for (i = 0; i < amf_self()->num_of_served_guami; i++) {
+        NGAP_ServedGUAMIItem_t *ServedGUAMIItem = NULL;
+        NGAP_GUAMI_t *gUAMI = NULL;
+        NGAP_PLMNIdentity_t *pLMNIdentity = NULL;
+        NGAP_AMFRegionID_t *aMFRegionID = NULL;
+        NGAP_AMFSetID_t *aMFSetID = NULL;
+        NGAP_AMFPointer_t *aMFPointer = NULL;
+
+        ServedGUAMIItem = (NGAP_ServedGUAMIItem_t *)
+                CALLOC(1, sizeof(NGAP_ServedGUAMIItem_t));
+        gUAMI = &ServedGUAMIItem->gUAMI;
+        pLMNIdentity = &gUAMI->pLMNIdentity;
+        aMFRegionID = &gUAMI->aMFRegionID;
+        aMFSetID = &gUAMI->aMFSetID;
+        aMFPointer = &gUAMI->aMFPointer;
+
+        ogs_asn_buffer_to_OCTET_STRING(
+                &amf_self()->served_guami[i].plmn_id,
+                OGS_PLMN_ID_LEN, pLMNIdentity);
+        ogs_ngap_uint8_to_AMFRegionID(
+                ogs_amf_region_id(&amf_self()->served_guami[i].amf_id),
+                aMFRegionID);
+        ogs_ngap_uint16_to_AMFSetID(
+                ogs_amf_set_id(&amf_self()->served_guami[i].amf_id),
+                aMFSetID);
+        ogs_ngap_uint8_to_AMFPointer(
+                ogs_amf_pointer(&amf_self()->served_guami[i].amf_id),
+                aMFPointer);
+
+        ASN_SEQUENCE_ADD(&ServedGUAMIList->list, ServedGUAMIItem);
+    }
+
+    *RelativeAMFCapacity = amf_self()->relative_capacity;
+
+    for (i = 0; i < amf_self()->num_of_plmn_support; i++) {
+        NGAP_PLMNSupportItem_t *NGAP_PLMNSupportItem = NULL;
+        NGAP_PLMNIdentity_t *pLMNIdentity = NULL;
+        NGAP_SliceSupportList_t *sliceSupportList = NULL;
+
+        NGAP_PLMNSupportItem = (NGAP_PLMNSupportItem_t *)
+                CALLOC(1, sizeof(NGAP_PLMNSupportItem_t));
+        pLMNIdentity = &NGAP_PLMNSupportItem->pLMNIdentity;
+        sliceSupportList = &NGAP_PLMNSupportItem->sliceSupportList;
+
+        ogs_asn_buffer_to_OCTET_STRING(
+                &amf_self()->plmn_support[i].plmn_id,
+                OGS_PLMN_ID_LEN, pLMNIdentity);
+        for (j = 0; j < amf_self()->plmn_support[i].num_of_s_nssai; j++) {
+            NGAP_SliceSupportItem_t *NGAP_SliceSupportItem = NULL;
+            NGAP_S_NSSAI_t *s_NSSAI = NULL;
+            NGAP_SST_t *sST = NULL;
+
+            NGAP_SliceSupportItem = (NGAP_SliceSupportItem_t *)
+                    CALLOC(1, sizeof(NGAP_SliceSupportItem_t));
+            s_NSSAI = &NGAP_SliceSupportItem->s_NSSAI;
+            sST = &s_NSSAI->sST;
+
+            ogs_asn_uint8_to_OCTET_STRING(
+                amf_self()->plmn_support[i].s_nssai[j].sst, sST);
+            if (amf_self()->plmn_support[i].s_nssai[j].sd.v !=
+                    OGS_S_NSSAI_NO_SD_VALUE) {
+                s_NSSAI->sD = CALLOC(1, sizeof(NGAP_SD_t));
+                ogs_asn_uint24_to_OCTET_STRING(
+                    amf_self()->plmn_support[i].s_nssai[j].sd, s_NSSAI->sD);
+            }
+
+            ASN_SEQUENCE_ADD(&sliceSupportList->list, NGAP_SliceSupportItem);
+        }
+
+        ASN_SEQUENCE_ADD(&PLMNSupportList->list, NGAP_PLMNSupportItem);
+    }
+
+    return ogs_ngap_encode(&pdu);
+}
 
 ogs_pkbuf_t *ngap_build_ng_setup_response(void)
 {

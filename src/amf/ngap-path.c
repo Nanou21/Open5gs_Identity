@@ -310,6 +310,28 @@ int ngap_send_ng_setup_response(amf_gnb_t *gnb)
     return rv;
 }
 
+int ngap_send_ng_registration_accept(amf_gnb_t *gnb)
+{
+    int rv;
+    ogs_pkbuf_t *ngap_buffer;
+
+    ogs_assert(gnb);
+
+    ogs_debug("NG-Setup responseRegistration Accept");
+
+    ngap_buffer = ngap_build_registration_accept_message();
+    if (!ngap_buffer) {
+        ogs_error("ngap_build_ng_setup_response() failed");
+        return OGS_ERROR;
+    }
+
+    rv = ngap_send_to_gnb(gnb, ngap_buffer, NGAP_NON_UE_SIGNALLING);
+    ogs_expect(rv == OGS_OK);
+
+    return rv;
+}
+
+
 int ngap_send_ng_setup_failure(
         amf_gnb_t *gnb, NGAP_Cause_PR group, long cause)
 {

@@ -463,6 +463,13 @@ typedef struct NGAP_ProtocolIE_Container_11854P52 {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } NGAP_ProtocolIE_Container_11854P52_t;
+// Added by Valentina
+typedef struct NGAP_ProtocolIE_Container_11854P123 {
+	A_SEQUENCE_OF(struct NGAP_NGRegistrationAcceptIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} NGAP_ProtocolIE_Container_11854P123_t;
 typedef struct NGAP_ProtocolIE_Container_11854P53 {
 	A_SEQUENCE_OF(struct NGAP_NGSetupFailureIEs) list;
 	
@@ -1377,7 +1384,10 @@ extern asn_TYPE_descriptor_t asn_DEF_NGAP_ProtocolIE_Container_11854P122;
 extern asn_SET_OF_specifics_t asn_SPC_NGAP_ProtocolIE_Container_11854P122_specs_245;
 extern asn_TYPE_member_t asn_MBR_NGAP_ProtocolIE_Container_11854P122_245[1];
 extern asn_per_constraints_t asn_PER_type_NGAP_ProtocolIE_Container_11854P122_constr_245;
-
+extern asn_TYPE_descriptor_t asn_DEF_NGAP_ProtocolIE_Container_11854P123;
+extern asn_SET_OF_specifics_t asn_SPC_NGAP_ProtocolIE_Container_11854P123_specs_247;
+extern asn_TYPE_member_t asn_MBR_NGAP_ProtocolIE_Container_11854P123_247[1];
+extern asn_per_constraints_t asn_PER_type_NGAP_ProtocolIE_Container_11854P123_constr_247;
 #ifdef __cplusplus
 }
 #endif

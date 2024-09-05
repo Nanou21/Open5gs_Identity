@@ -197,6 +197,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                     CASE(OGS_SBI_HTTP_METHOD_POST)
                         amf_namf_comm_handle_ue_context_transfer_request(
                                 stream, &sbi_message);
+                        ogs_info("VALENTINA - UE-Context transfer request received");
                         break;
                     DEFAULT
                         ogs_error("Invalid HTTP method [%s]",
@@ -881,7 +882,20 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         if (rc == OGS_OK) {
             e->gnb_id = gnb->id;
             e->ngap.message = &ngap_message;
-            ogs_fsm_dispatch(&gnb->sm, e);
+            
+            // Check if the message is an Initial UE Message
+            if (ngap_message.present ){
+                ogs_info("Initial UE Message received.");
+                //ngap_handle_initial_ue_message(gnb, &ngap_message);
+            }
+            // ngap_message.choice.initiatingMessage->value.present == NGAP_InitiatingMessage__value_PR_InitialUEMessage){
+            
+            // // Initial UE Message detected
+            // ogs_info("Initial UE Message received.");
+            // }
+            ogs_fsm_dispatch(&gnb->sm, e);   
+            //nas_5gs_send_registration_accept(amf_ue);
+            // return; 
         } else {
             ogs_error("Cannot decode NGAP message");
             r = ngap_send_error_indication(
@@ -953,6 +967,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                             NGAP_Cause_PR_misc,
                             NGAP_CauseMisc_control_processing_overload,
                             NGAP_UE_CTX_REL_NG_CONTEXT_REMOVE, 0);
+                    ogs_info("Valentina: Context removed here");
                     ogs_expect(r == OGS_OK);
                     ogs_assert(r != OGS_ERROR);
                     ogs_pkbuf_free(pkbuf);
@@ -1060,5 +1075,5 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
     default:
         ogs_error("No handler for event %s", amf_event_get_name(e));
         break;
-    }
+        }
 }
