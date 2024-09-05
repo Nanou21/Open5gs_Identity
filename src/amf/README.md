@@ -11,7 +11,8 @@ To decentralize authentication, we introduce the following changes:
 1. **Interception of UE Registration Request:**
     - We intercept the system at the point where it receives the Registration Request from the UE, as part of the core 5G network services.
     - The diagram below better illustrates that:
-    ![Proposed Registration Architecture](../registration_image.png)
+        
+        ![Proposed Registration Architecture](../registration_image.png)
 
     - This required identifying the function that handles the initial message from the UE, which encapsulates the registration request. The function handling the initial UE message is located in the file:[Message Handler](ngap-handler.c)
     - The logic for sending the new message is implemented in:[Ngap_Handler](ngap-handler.c)
