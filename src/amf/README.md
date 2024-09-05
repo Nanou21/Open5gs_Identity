@@ -29,5 +29,5 @@ To decentralize authentication, we introduce the following changes:
 
 ## Results 
 As of now, the message is sent to the gNodeB. What remains is to send a confirmation to the AMF and forward the response to the UE.
-```bash
+
 
